@@ -217,13 +217,18 @@ def generate_altimetry_timeseries(
             if mask is None:
                 continue
 
-            sampled = geemap.ee_to_gdf(
-                mask.sampleRegions(
-                    geemap.geopandas_to_ee(gdf),
-                    scale=30,
+            fc = mask.sampleRegions(
+                geemap.geopandas_to_ee(gdf),
+                scale=30,
                     geometries=True
-                )
             )
+
+            # --- CRITICAL FIX FOR CLASS 5 ---
+            if fc.size().getInfo() == 0:
+                    continue
+
+            sampled = geemap.ee_to_gdf(fc)
+
 
             if sampled.empty:
                 continue
